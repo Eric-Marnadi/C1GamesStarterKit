@@ -5,7 +5,7 @@ import warnings
 from sys import maxsize
 import json
 
-
+from initial_setup import spawn_initial_structure
 """
 Most of the algo code you write will be in this file unless you create new
 modules yourself. Start by modifying the 'on_turn' function.
@@ -79,8 +79,17 @@ class AlgoStrategy(gamelib.AlgoCore):
         self.build_reactive_defense(game_state)
 
         # If the turn is less than 5, stall with interceptors and wait to see enemy's base
-        if game_state.turn_number < 5:
+        if game_state.turn_number==0:
+            WALL_LOC, TURR_LOC = spawn_initial_structure()
+            gamelib.debug_write("Successfully added walls: {}".format(game_state.attempt_spawn(WALL, WALL_LOC)))
+            gamelib.debug_write("Successfully added Turrets: {}".format(game_state.attempt_spawn(TURRET, TURR_LOC)))
+            
+            game_state.attempt_spawn(WALL, WALL_LOC)
+            game_state.attempt_spawn(TURRET, TURR_LOC)
+            
+        elif game_state.turn_number < 5:
             self.stall_with_interceptors(game_state)
+            
         else:
             # Now let's analyze the enemy base to see where their defenses are concentrated.
             # If they have many units in the front we can build a line for our demolishers to attack them at long range.
@@ -112,11 +121,11 @@ class AlgoStrategy(gamelib.AlgoCore):
         # Place turrets that attack enemy units
         turret_locations = [[0, 13], [27, 13], [8, 11], [19, 11], [13, 11], [14, 11]]
         # attempt_spawn will try to spawn units if we have resources, and will check if a blocking unit is already there
-        game_state.attempt_spawn(TURRET, turret_locations)
+        # game_state.attempt_spawn(TURRET, turret_locations)
         
         # Place walls in front of turrets to soak up damage for them
         wall_locations = [[8, 12], [19, 12]]
-        game_state.attempt_spawn(WALL, wall_locations)
+        # game_state.attempt_spawn(WALL, wall_locations)
         # upgrade walls so they soak more damage
         game_state.attempt_upgrade(wall_locations)
 
